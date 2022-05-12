@@ -4,8 +4,4 @@ mergeInto(LibraryManager.library, {
     window.alert("Hello, world!");
   },
 
-  ChangeText: function () {
-    window.unityInstance.SendMessage();
-  }
-
 });
