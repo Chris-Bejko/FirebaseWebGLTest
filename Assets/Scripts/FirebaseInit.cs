@@ -6,32 +6,47 @@ using UnityEngine.UI;
 
 public class FirebaseInit : MonoBehaviour
 {
-    public Text text;
+     public Text text;
 
-    [DllImport("_Internal")]
-    private static extern void GetJSON(string path, string objectName, string callback, string fallback);
+    /* [DllImport("_Internal")]
+     private static extern void GetJSON(string path, string objectName, string callback, string fallback);
 
 
-    void Start()
+     void Start()
+     {
+         text.text = "Start worked";
+         GetJSON(path: "example", gameObject.name, callback: "OnRequestSuccess", fallback: "OnRequestFailed");
+     }
+
+     public  void OnRequestSuccess(string data)
+     {
+         text.color = Color.green;
+         text.text = data;
+     }
+
+     public void OnRequestFailed(string error)
+     {
+         text.color = Color.red;
+         text.text = error;
+     }
+
+     public void MyFunction()
+     {
+         text.text = "My function success";
+     }
+    */
+
+    [DllImport("__Internal")]
+    private static extern void Hello();
+
+    private void Start()
     {
-        text.text = "Start worked";
-        GetJSON(path: "example", gameObject.name, callback: "OnRequestSuccess", fallback: "OnRequestFailed");
+        Hello();
     }
 
-    public  void OnRequestSuccess(string data)
+    public void MessageFromJavascript(string message)
     {
-        text.color = Color.green;
-        text.text = data;
-    }
-
-    public void OnRequestFailed(string error)
-    {
-        text.color = Color.red;
-        text.text = error;
-    }
-
-    public void MyFunction()
-    {
-        text.text = "My function success";
+        Debug.Log(message);
+        text.text = "Text Changed Successfully";
     }
 }
