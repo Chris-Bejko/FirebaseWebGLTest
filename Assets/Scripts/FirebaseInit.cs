@@ -18,15 +18,20 @@ public class FirebaseInit : MonoBehaviour
         GetJSON(path: "example", gameObject.name, callback: "OnRequestSuccess", fallback: "OnRequestFailed");
     }
 
-    void OnRequestSuccess(string data)
+    public  void OnRequestSuccess(string data)
     {
         text.color = Color.green;
         text.text = data;
     }
 
-    void OnRequestFailed(string error)
+    public void OnRequestFailed(string error)
     {
         text.color = Color.red;
         text.text = error;
+    }
+
+    public void MyFunction()
+    {
+        text.text = "My function success";
     }
 }

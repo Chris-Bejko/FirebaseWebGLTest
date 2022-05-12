@@ -5,11 +5,7 @@ using UnityEngine.UI;
 
 public class JavascriptHook : MonoBehaviour
 {
-
     public Image squareImage;
-
- 
-
 
     void Update()
     {
