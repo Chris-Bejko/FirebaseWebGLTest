@@ -14,7 +14,8 @@ public class FirebaseInit : MonoBehaviour
     private int elapsedDays;
     string path;
     string generalData;
-
+    float startTime;
+    float quitTime;
     /// <summary>
     /// Test variables (coins, gems, etc)
     /// </summary>
@@ -24,28 +25,27 @@ public class FirebaseInit : MonoBehaviour
     [DllImport("__Internal")]
     private static extern void GetJSON(string path, string objectName, string callback, string fallback);
     [DllImport("__Internal")]
-    private static extern void PushJSON(string path, string key, string value, string objectName, string callback, string fallback);
-    [DllImport("__Internal")]
     private static extern void PostJSON(string path, string value, string objectName, string callback, string fallback);
     [DllImport("__Internal")]
     private static extern void ModifyNumberWithTransaction(string path, float amount, string objectName, string callback, string fallback);
     IEnumerator Start()
     {
+        startTime = Time.time;
         generalData = "";
         WaitForSeconds wait = new WaitForSeconds(2f);
         currentDate = DateTime.Now.ToString("dd/MM/yy");
         text.text = "Waiting 2 seconds";
         yield return wait;
-        GetJSON(string.Format("Retention/{0}/D1", username), gameObject.name, "CompareDates", "OnRequestFailed"); ///Player retention by days, and daily active users
+        GetJSON(string.Format("{0}/Retention/D1", username), gameObject.name, "PerformStartActions", "OnRequestFailed"); ///Player retention by days, and daily active users
     }
 
     /// <summary>
     /// Date Comparing to determine which day of activity it is for this Player
     /// </summary>
     /// <param name="date"></param>
-    public void CompareDates(string date)
+    public void PerformStartActions(string date)
     {
-        StartCoroutine(IECompareDates(date));
+        StartCoroutine(IEPerformStartActions(date));
     }
 
     /// <summary>
@@ -53,21 +53,25 @@ public class FirebaseInit : MonoBehaviour
     /// </summary>
     /// <param name="date"></param>
     /// <returns></returns>
-    IEnumerator IECompareDates(string date)
+    IEnumerator IEPerformStartActions(string date)
     {
+        ModifyNumberWithTransaction(string.Format("{0}/SessionsDaily/D{1}", username, elapsedDays + 1), 1, gameObject.name, "OnRequestSuccess", "OnRequestFailed");
+        ModifyNumberWithTransaction(string.Format("{0}/TotalSessions", username), 1, gameObject.name, "OnRequestSuccess", "OnRequestFailed");
         if (date.Equals("null")) ///D1 does not exist, so this is day 1 for the username
         {
-            path = string.Format("Retention/{0}/D1", username);
+            path = string.Format("{0}/Retention/D1", username);
             text.text = "date is null";
             ///Adds the current date as D1 , since there is no D1 key
             PostJSON(path, currentDate, gameObject.name, "OnRequestSuccess", "OnRequestFailed");
             yield return new WaitForSeconds(0.5f);
-            GetJSON(path, gameObject.name, "ReturnData", "OnRequestFailed");
-            yield return new WaitUntil(() => !generalData.Equals(""));
+            while (generalData.Equals(""))
+            {
+                GetJSON(path, gameObject.name, "ReturnData", "OnRequestFailed");
+                yield return null;
+            }
             ///Increases DAU by 1
             ModifyNumberWithTransaction(string.Format("Main/DAU/{0}", currentDate.Replace("/", "-")), 1, gameObject.name, "OnRequestSuccess", "OnRequestFailed");
             generalData = "";
-            //UpdateGemsAndCoins();
             yield return new WaitUntil(() => generalData == "");
         }
 
@@ -78,9 +82,12 @@ public class FirebaseInit : MonoBehaviour
         DateTime currentDateTime = DateTime.Parse(currentDate, new CultureInfo("fr-FR"));
         elapsedDays = (int)(currentDateTime - firstDateTime).TotalDays;
         ///Determines the path for this day (e.x D5), and tries to get it
-        path = string.Format("Retention/{0}/D{1}", username, elapsedDays + 1);
-        GetJSON(path, gameObject.name, "ReturnData", "OnRequestFailed");
-        yield return new WaitUntil(() => !generalData.Equals(""));
+        path = string.Format("{0}/Retention/D{1}", username, elapsedDays + 1);
+        while (generalData.Equals(""))
+        {
+            GetJSON(path, gameObject.name, "ReturnData", "OnRequestFailed");
+            yield return null;
+        }
         OnRequestSuccess(generalData);
         if (generalData.Equals("null")) ///If the path is null, this is the first log in for today
         {
@@ -90,6 +97,8 @@ public class FirebaseInit : MonoBehaviour
             ModifyNumberWithTransaction(string.Format("Main/DAU/{0}", date.Replace("/", "-")), 1, gameObject.name, "OnRequestSuccess", "OnRequestFailed"); //IF the elapsed days were not 0 (meaning that this is a different day), we increment DAU by 1
             generalData = "";
         }
+        ///Update Daily Sessions and Total Sessions for this user
+
     }
     private void OnApplicationQuit()
     {
@@ -99,17 +108,56 @@ public class FirebaseInit : MonoBehaviour
     private void PerformApplicationQuitFunctions()
     {
         UpdateGemsAndCoins();
-
+        UpdateAverageSessionDuration();
     }
     public void Quit()
     {
-        Application.Quit();
+        //Application.Quit();
+        PerformApplicationQuitFunctions();
+
+    }
+    private void UpdateAverageSessionDuration()
+    {
+        StartCoroutine(IEUpdateAverageSessionDuration());
+    }
+    private IEnumerator IEUpdateAverageSessionDuration()
+    {
+        quitTime = Time.time;
+        ///First we get the total sessions
+        while (generalData.Equals(""))
+        {
+            GetJSON(string.Format("{0}/TotalSessions", username), gameObject.name, "ReturnData", "OnRequestFailed");
+            yield return null;
+        }
+        OnRequestSuccess("Received total sessions: " + generalData);
+        generalData = generalData == "null" ? "0" : generalData;
+        int totalSessions = int.Parse(generalData);
+        yield return new WaitForSeconds(2f);
+        generalData = "";
+        ///Then we get the total sessions durations (in minutes?)
+        while (generalData.Equals(""))
+        {
+            GetJSON(string.Format("{0}/TotalSessionsDuration", username), gameObject.name, "ReturnData", "OnRequestFailed");
+            yield return null;
+        }
+        generalData = generalData == "null" ? "\"0\"" : generalData;
+        float totalSessionsDuration = float.Parse(generalData.Substring(1, generalData.Length - 2));
+        OnRequestSuccess("Receveid totalSessionsDuration: " + totalSessionsDuration);
+        yield return new WaitForSeconds(2f);
+        generalData = "";
+        ///Now we calculate this sessions's duration
+        float totalDuration = quitTime - startTime;
+        totalSessionsDuration += totalDuration;
+        float averageSessionsDuration = totalSessionsDuration / totalSessions;
+        ///We post it, and also add the new totalSessionsDuration to the database
+        PostJSON(string.Format("{0}/TotalSessionsDuration", username), totalSessionsDuration.ToString(), gameObject.name, "OnRequestSuccess", "OnRequestFailed");
+        PostJSON(string.Format("{0}/AverageSessionDuration", username), averageSessionsDuration.ToString(), gameObject.name, "OnRequestSuccess", "OnRequestFailed");
     }
     private void UpdateGemsAndCoins()
     {
-        path = string.Format("Balance/{0}/D{1}/coins", username, elapsedDays + 1);
+        path = string.Format("{0}/Balance/D{1}/Coins", username, elapsedDays + 1);
         PostJSON(path, coins.ToString(), gameObject.name, "OnRequestSuccess", "OnRequestFailed");
-        path = string.Format("Balance/{0}/D{1}/gems", username, elapsedDays + 1);
+        path = string.Format("{0}/Balance/D{1}/Gems", username, elapsedDays + 1);
         PostJSON(path, gems.ToString(), gameObject.name, "OnRequestSuccess", "OnRequestFailed");
     }
 
