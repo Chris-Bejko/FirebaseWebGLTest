@@ -53,24 +53,6 @@ mergeInto(LibraryManager.library, {
             unityInstance.Module.SendMessage(parsedObjectName, parsedFallback, JSON.stringify(error, Object.getOwnPropertyNames(error)));
         }
     },
-    PostJSONToChild: function(path, child, value, objectName, callback, fallback) {
-        var parsedPath = UTF8ToString(path);
-        var parsedChild = UTF8ToString(child);
-        var parsedValue = UTF8ToString(value);
-        var parsedObjectName = UTF8ToString(objectName);
-        var parsedCallback = UTF8ToString(callback);
-        var parsedFallback = UTF8ToString(fallback);
-
-        try {
-
-            firebase.database().ref(parsedPath).child(parsedChild).setValue(parsedValue).then(function(unused) {
-                unityInstance.Module.SendMessage(parsedObjectName, parsedCallback, "Success: " + parsedValue + " was posted to " + parsedPath + " / " + parsedChild);
-            });
-
-        } catch (error) {
-            unityInstance.Module.SendMessage(parsedObjectName, parsedFallback, JSON.stringify(error, Object.getOwnPropertyNames(error)));
-        }
-    },
     ModifyNumberWithTransaction: function(path, amount, objectName, callback, fallback) {
         var parsedPath = UTF8ToString(path);
         var parsedObjectName = UTF8ToString(objectName);
