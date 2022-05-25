@@ -338,17 +338,26 @@ public class FirebaseInit : MonoBehaviour
     /// <returns></returns>
     private IEnumerator GetIP(string url)
     {
-        string ip = new System.Net.WebClient().DownloadString("https://api.ipify.org");
-        string uri = $"https://ipapi.co/{ip}/json/";
-        using (UnityWebRequest webRequest = new UnityWebRequest(uri))
+        UnityWebRequest www = UnityWebRequest.Get("https://api.ipify.org");
+        yield return www.SendWebRequest();
+        if (www.result == UnityWebRequest.Result.ConnectionError)
         {
-            yield return webRequest.SendWebRequest();
-            string[] pages = uri.Split('/');
-            int page = pages.Length - 1;
-
-            IpApiData ipApiData = IpApiData.CreateFromJSON(webRequest.downloadHandler.text);
-            PostJSON(string.Format("{0}/Country", username), ipApiData.country_name, gameObject.name, "OnRequestSuccess", "OnRequestFailed");
+            OnRequestFailed(www.error);
         }
+        else
+        {
+            OnRequestSuccess(www.result.ToString());
+        }
+        string ip = www.downloadHandler.text;
+        string uri = $"https://ipapi.co/{ip}/json/";
+        UnityWebRequest webRequest = UnityWebRequest.Get(uri);
+        string uriTotext = webRequest.downloadHandler.text;
+        OnRequestSuccess("webRequest Made at ip: " + ip);
+        yield return webRequest.SendWebRequest();
+        string[] pages = uriTotext.Split('/');
+        int page = pages.Length - 1;
+        IpApiData ipApiData = IpApiData.CreateFromJSON(webRequest.downloadHandler.text);
+        PostJSON(string.Format("{0}/Country", username), ipApiData.country_name, gameObject.name, "OnRequestSuccess", "OnRequestFailed");
     }
 
     /// <summary>
