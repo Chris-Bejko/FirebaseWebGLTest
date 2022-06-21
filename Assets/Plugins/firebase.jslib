@@ -76,4 +76,22 @@ mergeInto(LibraryManager.library, {
         }
     },
 
+
+    SignInUserAnonymously: function(objectName, callback, fallback){
+        var parsedObjectName = UTF8ToString(objectName);
+        var parsedCallback = UTF8ToString(callback);
+        var parsedFallback = UTF8ToString(fallback);
+        firebase.auth().signInAnonymously()
+            .then(() => {
+            // Signed in..
+             unityInstance.Module.SendMessage(parsedObjectName, parsedCallback, "Success: user signed in anonymously");
+        })
+        .catch((error) => {
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            unityInstance.Module.SendMessage(parsedObjectName, parsedFallback, JSON.stringify(error, Object.getOwnPropertyNames(error)));
+        });
+    
+    },
+
 });
