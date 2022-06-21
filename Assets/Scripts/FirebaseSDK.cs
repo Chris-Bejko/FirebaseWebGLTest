@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Globalization;
 using UnityEngine.Networking;
 using UnityEngine;
-
+using UnityEngine.UI;
 
 
 public class FirebaseSDK : MonoBehaviour
@@ -25,6 +25,9 @@ public class FirebaseSDK : MonoBehaviour
     private float _quitTime;
     private bool _isDoingOperation;
 
+
+    [SerializeField]
+    Text text;
     /// What operation was requested
     private AnalyticsEventID _id;
     /// What data was given from the operation, in case we want to re-do it
@@ -64,10 +67,12 @@ public class FirebaseSDK : MonoBehaviour
         _generalData = "";
         currentDate = DateTime.Now.ToString("dd/MM/yy");
         kUsername = e.StringData;
-        //SignInUserAnonymously(gameObject.name, "OnRequestSuccess" , "OnRequestFailed");
+        ///To sign in anonymously:
+        SignInUserAnonymously(gameObject.name, "OnRequestSuccess" , "OnRequestFailed");
+        ///Log event :
         LogEventWithParameter("test_event", "test_parameter", gameObject.name, "OnRequestSuccess", "OnRequestFailed");
-        GetJSON($"{kUsername}/Retention/D1", gameObject.name, "PerformStartActions", "OnRequestFailed"); ///Player retention by days, and daily active users\
-        GetMarketingData();
+        //GetJSON($"{kUsername}/Retention/D1", gameObject.name, "PerformStartActions", "OnRequestFailed"); ///Player retention by days, and daily active users\
+        //GetMarketingData();
     }
 
     /// <summary>
@@ -460,7 +465,7 @@ public class FirebaseSDK : MonoBehaviour
         var page = pages.Length - 1;
         var ipApiData = IpApiData.CreateFromJSON(webRequest.downloadHandler.text);
 
-        PostJSON($"{kUsername}/Country", ipApiData.CountryName, gameObject.name, "OnRequestSuccess", "OnRequestFailed");
+        PostJSON($"{kUsername}/Country", ipApiData.country_name, gameObject.name, "OnRequestSuccess", "OnRequestFailed");
     }
 
     /// <summary>
@@ -509,6 +514,7 @@ public class FirebaseSDK : MonoBehaviour
     {
         var returnEvent = new AnalyticsEvent(_id, AnalyticsEventReturnType.OperationSuccesful, _data);
         analysisManager.ProccessReturnResult(returnEvent);
+        text.text = data;
     }
 
     /// <summary>
@@ -519,6 +525,8 @@ public class FirebaseSDK : MonoBehaviour
     {
         var returnEvent = new AnalyticsEvent(_id, AnalyticsEventReturnType.OperationFailed, _data);
         analysisManager.ProccessReturnResult(returnEvent);
+        text.text = error;
+
     }
 
     public void ReturnData(string data)
@@ -526,6 +534,7 @@ public class FirebaseSDK : MonoBehaviour
         var e = new AnalyticsEvent(_id, AnalyticsEventReturnType.OperationSuccesful, _data);
         analysisManager.ProccessReturnResult(e);
         _generalData = data;
+        text.text = data;
     }
 
     /*private IEnumerator EditorTest()
@@ -554,7 +563,7 @@ public class FirebaseSDK : MonoBehaviour
 
 public class IpApiData
 {
-    public readonly string CountryName = string.Empty;
+    public string country_name;
 
     public static IpApiData CreateFromJSON(string jsonString)
     {

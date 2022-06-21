@@ -77,21 +77,21 @@ mergeInto(LibraryManager.library, {
     },
 
 
-    SignInUserAnonymously: function(objectName, callback, fallback){
+   SignInUserAnonymously: function (objectName, callback, fallback) {
         var parsedObjectName = UTF8ToString(objectName);
         var parsedCallback = UTF8ToString(callback);
         var parsedFallback = UTF8ToString(fallback);
-        firebase.auth().signInAnonymously()
-            .then(() => {
-            // Signed in..
-             unityInstance.Module.SendMessage(parsedObjectName, parsedCallback, "Success: user signed in anonymously");
-        })
-        .catch((error) => {
-            var errorCode = error.code;
-            var errorMessage = error.message;
+
+        try {
+            firebase.auth().signInAnonymously().then(function (result) {
+                unityInstance.Module.SendMessage(parsedObjectName, parsedCallback, "Success: signed up for " + result);
+            }).catch(function (error) {
+                unityInstance.Module.SendMessage(parsedObjectName, parsedFallback, JSON.stringify(error, Object.getOwnPropertyNames(error)));
+            });
+
+        } catch (error) {
             unityInstance.Module.SendMessage(parsedObjectName, parsedFallback, JSON.stringify(error, Object.getOwnPropertyNames(error)));
-        });
-    
+        }
     },
 
     LogEventWithParameter: function(eventName, parameter, objectName, callback, fallback){
@@ -100,10 +100,9 @@ mergeInto(LibraryManager.library, {
         var parsedObjectName = UTF8ToString(objectName);
         var parsedCallback = UTF8ToString(callback);
         var parsedFallback = UTF8ToString(fallback);
-
         try{
             firebase.analytics().logEvent(parsedEventName);
-            unityInstance.Module.SendMessage(parsedObjectName, parsedCallback, "Success: logged event");
+            unityInstance.Module.SendMessage(parsedObjectName, parsedCallback, "Success: logged event: " + parsedEventName);
         }catch(error){
             unityInstance.Module.SendMessage(parsedObjectName, parsedFallback, JSON.stringify(error, Object.getOwnPropertyNames(error)));
         }
