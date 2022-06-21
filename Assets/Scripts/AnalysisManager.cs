@@ -16,7 +16,7 @@ public partial class AnalysisManager : MonoBehaviour
 
     private void Update()
     {
-        _dataCollectionTimer += Time.deltaTime;
+        /*_dataCollectionTimer += Time.deltaTime;
         text.text = _dataCollectionTimer.ToString();
         if (_dataCollectionTimer > dataCollectionInterval)
         {
@@ -25,7 +25,7 @@ public partial class AnalysisManager : MonoBehaviour
             Debug.Log("UpdatedSession");
             var e = new AnalyticsEvent(AnalyticsEventID.UpdateSessionProgress, "Kitsomo");
             ProccessResult(e);
-        }
+        }*/
     }
 
     public void EnableAnalyticsCollection()

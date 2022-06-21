@@ -43,6 +43,8 @@ public class FirebaseSDK : MonoBehaviour
     private static extern void ModifyNumberWithTransaction(string path, float amount, string objectName, string callback, string fallback);
     [DllImport("__Internal")]
     private static extern void SignInUserAnonymously(string objectName, string callback, string fallback);
+    [DllImport("__Internal")]
+    private static extern void LogEventWithParameter(string eventName, string parameter, string objectName, string callback, string fallback);
     private void Awake()
     {
         Instance = this;
@@ -62,9 +64,10 @@ public class FirebaseSDK : MonoBehaviour
         _generalData = "";
         currentDate = DateTime.Now.ToString("dd/MM/yy");
         kUsername = e.StringData;
-        GetMarketingData();
-        SignInUserAnonymously(gameObject.name, "OnRequestSuccess" , "OnRequestFailed");
+        //SignInUserAnonymously(gameObject.name, "OnRequestSuccess" , "OnRequestFailed");
+        LogEventWithParameter("test_event", "test_parameter", gameObject.name, "OnRequestSuccess", "OnRequestFailed");
         GetJSON($"{kUsername}/Retention/D1", gameObject.name, "PerformStartActions", "OnRequestFailed"); ///Player retention by days, and daily active users\
+        GetMarketingData();
     }
 
     /// <summary>

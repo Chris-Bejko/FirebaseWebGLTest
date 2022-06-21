@@ -94,4 +94,20 @@ mergeInto(LibraryManager.library, {
     
     },
 
+    LogEventWithParameter: function(eventName, parameter, objectName, callback, fallback){
+        var parsedEventName = UTF8ToString(eventName);
+        var parsedParameter = UTF8ToString(parameter);
+        var parsedObjectName = UTF8ToString(objectName);
+        var parsedCallback = UTF8ToString(callback);
+        var parsedFallback = UTF8ToString(fallback);
+
+        try{
+            firebase.analytics().logEvent(parsedEventName);
+            unityInstance.Module.SendMessage(parsedObjectName, parsedCallback, "Success: logged event");
+        }catch(error){
+            unityInstance.Module.SendMessage(parsedObjectName, parsedFallback, JSON.stringify(error, Object.getOwnPropertyNames(error)));
+        }
+    
+    },
+
 });
