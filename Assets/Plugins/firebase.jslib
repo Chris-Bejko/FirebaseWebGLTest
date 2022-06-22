@@ -84,6 +84,17 @@ mergeInto(LibraryManager.library, {
 
         try {
             firebase.auth().signInAnonymously().then(function (result) {
+                firebase.auth().onAuthStateChanged((user) => {
+                if(user){
+                    var uid = user.uid;
+                    firebase.analytics().logEvent('login');
+                    unityInstance.Module.SendMessage(parsedObjectName, parsedCallback, "Success: signed up for " + uid);
+                }else{
+                    unityInstance.Module.SendMessage(parsedObjectName, parsedFallback, "Error getting user");
+                }
+            
+                
+                });
                 unityInstance.Module.SendMessage(parsedObjectName, parsedCallback, "Success: signed up for " + result);
             }).catch(function (error) {
                 unityInstance.Module.SendMessage(parsedObjectName, parsedFallback, JSON.stringify(error, Object.getOwnPropertyNames(error)));
@@ -92,6 +103,10 @@ mergeInto(LibraryManager.library, {
         } catch (error) {
             unityInstance.Module.SendMessage(parsedObjectName, parsedFallback, JSON.stringify(error, Object.getOwnPropertyNames(error)));
         }
+
+ 
+    
+        
     },
 
     LogEventWithParameter: function(eventName, parameter, objectName, callback, fallback){
