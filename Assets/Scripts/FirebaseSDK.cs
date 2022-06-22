@@ -70,7 +70,7 @@ public class FirebaseSDK : MonoBehaviour
         ///To sign in anonymously:
         SignInUserAnonymously(gameObject.name, "OnRequestSuccess" , "OnRequestFailed");
         ///Log event :
-        LogEventWithParameter("test_event", "test_parameter", gameObject.name, "OnRequestSuccess", "OnRequestFailed");
+        LogEventWithParameter("test_event", "items: [{test_parameter : '0'}]", gameObject.name, "OnRequestSuccess", "OnRequestFailed");
         //GetJSON($"{kUsername}/Retention/D1", gameObject.name, "PerformStartActions", "OnRequestFailed"); ///Player retention by days, and daily active users\
         //GetMarketingData();
     }
