@@ -4,11 +4,29 @@ using UnityEngine.Assertions;
 
 public enum AnalyticsEventID
 {
-    ///0-2 General
-    StartSession = 0,
-    UpdateSessionProgress = 1,
-    EndSession = 2,
+    RewardMoon = 0,
+    SpendMoon,
+    NFTOwned,
+    NFTPlaced,
+    TotalNFTValue,
+    LoadWorldMap,
+    SelectTile,
+    SelectTileConfirmed,
+    ConfirmName,
+    CreateTown,
+    LoadIntroductionPopup,
+    CloseIntroductionPopup,
+    CompleteSale,
+    ReachFuelProduction,
+    ClearXObstacles,
+    EnterFreeDateTour,
+    EnterPaidDateTour,
+    RewardsCollected,
+    RewardsExpired,
+}
 
+public enum DatabaseEventID
+{
     ///3-6  Currency
     SpendCoins = 3,
     EarnCoins = 4,
@@ -26,13 +44,9 @@ public enum AnalyticsEventID
     EnterP2ETournament = 14,
 
     ///15-18 Moon&NFT
-    RewardMOON = 15,
-    SpendMOON = 16,
     GainNFT = 17,
     PlaceNFT = 18
 }
-
-
 public enum AnalyticsEventReturnType
 {
     OperationSuccesful = 0,
@@ -43,7 +57,7 @@ public struct AnalyticsEvent
 {
     public AnalyticsEventID _id { get; private set; }
     public AnalyticsEventReturnType _return { get; private set; }
-    private readonly object _data; ///float string and int , will contain all the data we need to pass to the database (amounts, names etc)
+    private readonly object _data; ///float string and int , will contain all the data we need to pass as parameteres to the analytics
 
     public int IntData
     {

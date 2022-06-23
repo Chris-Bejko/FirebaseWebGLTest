@@ -34,6 +34,14 @@ public partial class AnalysisManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Event logging for Anayltics
+    /// </summary>
+    /// <param name="e"></param>
+    public static void HandlerLogEvent(AnalyticsEvent e)
+    {
+        FirebaseSDK.Instance.LogEvent(e);
+    }
+    /// <summary>
     /// On session start, we update some data automatically: 
     /// </summary>
     public static void HandlerStartSession(AnalyticsEvent e)

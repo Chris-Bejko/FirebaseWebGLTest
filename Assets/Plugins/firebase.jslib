@@ -46,11 +46,11 @@ mergeInto(LibraryManager.library, {
         try {
 
             firebase.database().ref(parsedPath).set(parsedValue).then(function(unused) {
-                unityInstance.Module.SendMessage(parsedObjectName, parsedCallback, "Success: " + parsedValue + " was posted to " + parsedPath);
+                window.unityInstance.SendMessage(parsedObjectName, parsedCallback, "Success: " + parsedValue + " was posted to " + parsedPath);
             });
 
         } catch (error) {
-            unityInstance.Module.SendMessage(parsedObjectName, parsedFallback, JSON.stringify(error, Object.getOwnPropertyNames(error)));
+            window.unityInstance.SendMessage(parsedObjectName, parsedFallback, JSON.stringify(error, Object.getOwnPropertyNames(error)));
         }
     },
     ModifyNumberWithTransaction: function(path, amount, objectName, callback, fallback) {
@@ -68,11 +68,11 @@ mergeInto(LibraryManager.library, {
                     return amount;
                 }
             }).then(function(unused) {
-                unityInstance.Module.SendMessage(parsedObjectName, parsedCallback, "Success: transaction run in " + parsedPath);
+                window.unityInstance.SendMessage(parsedObjectName, parsedCallback, "Success: transaction run in " + parsedPath);
             });
 
         } catch (error) {
-            unityInstance.Module.SendMessage(parsedObjectName, parsedFallback, JSON.stringify(error, Object.getOwnPropertyNames(error)));
+            window.unityInstance.SendMessage(parsedObjectName, parsedFallback, JSON.stringify(error, Object.getOwnPropertyNames(error)));
         }
     },
 
@@ -88,20 +88,20 @@ mergeInto(LibraryManager.library, {
                 if(user){
                     var uid = user.uid;
                     firebase.analytics().logEvent('login');
-                    unityInstance.Module.SendMessage(parsedObjectName, parsedCallback, "Success: signed up for " + uid);
+                    window.unityInstance.SendMessage(parsedObjectName, parsedCallback, "Success: signed up for " + uid);
                 }else{
-                    unityInstance.Module.SendMessage(parsedObjectName, parsedFallback, "Error getting user");
+                    window.unityInstance.SendMessage(parsedObjectName, parsedFallback, "Error getting user");
                 }
             
                 
                 });
-                unityInstance.Module.SendMessage(parsedObjectName, parsedCallback, "Success: signed up for " + result);
+                window.unityInstance.SendMessage(parsedObjectName, parsedCallback, "Success: signed up for " + result);
             }).catch(function (error) {
-                unityInstance.Module.SendMessage(parsedObjectName, parsedFallback, JSON.stringify(error, Object.getOwnPropertyNames(error)));
+                window.unityInstance.SendMessage(parsedObjectName, parsedFallback, JSON.stringify(error, Object.getOwnPropertyNames(error)));
             });
 
         } catch (error) {
-            unityInstance.Module.SendMessage(parsedObjectName, parsedFallback, JSON.stringify(error, Object.getOwnPropertyNames(error)));
+            window.unityInstance.SendMessage(parsedObjectName, parsedFallback, JSON.stringify(error, Object.getOwnPropertyNames(error)));
         }
 
  
@@ -109,17 +109,35 @@ mergeInto(LibraryManager.library, {
         
     },
 
-    LogEventWithParameter: function(eventName, parameter, objectName, callback, fallback){
+    LogEventWithParameter: function(eventName, parameter, parameterValue, objectName, callback, fallback){
         var parsedEventName = UTF8ToString(eventName);
         var parsedParameter = UTF8ToString(parameter);
+        var parsedValue = UTF8ToString(parameterValue);
+        var parsedObjectName = UTF8ToString(objectName);
+        var parsedCallback = UTF8ToString(callback);
+        var parsedFallback = UTF8ToString(fallback);
+        //let name = parsedParamater;
+        //console.log(parsedEventName);
+        //console.log([name]);
+        //console.log(parsedValue);
+        try{
+            firebase.analytics().logEvent(parsedEventName,parsedValue);
+            window.unityInstance.SendMessage(parsedObjectName, parsedCallback, "Success: logged event: " + parsedEventName);
+        }catch(error){
+            window.unityInstance.SendMessage(parsedObjectName, parsedFallback, JSON.stringify(error, Object.getOwnPropertyNames(error)));
+        }
+    
+    },
+     SetUserProperty: function(userPropertySet, objectName, callback, fallback){
+        var parsedUserPropertySet = UTF8ToString(userPropertySet);        
         var parsedObjectName = UTF8ToString(objectName);
         var parsedCallback = UTF8ToString(callback);
         var parsedFallback = UTF8ToString(fallback);
         try{
-            firebase.analytics().logEvent(parsedEventName, parameter);
-            unityInstance.Module.SendMessage(parsedObjectName, parsedCallback, "Success: logged event: " + parsedEventName);
+            firebase.analytics().setUserProperties(parsedUserPropertySet);
+            window.unityInstance.SendMessage(parsedObjectName, parsedCallback, "Success: set user property : " + parsedUserPropertySet);
         }catch(error){
-            unityInstance.Module.SendMessage(parsedObjectName, parsedFallback, JSON.stringify(error, Object.getOwnPropertyNames(error)));
+            window.unityInstance.SendMessage(parsedObjectName, parsedFallback, JSON.stringify(error, Object.getOwnPropertyNames(error)));
         }
     
     },

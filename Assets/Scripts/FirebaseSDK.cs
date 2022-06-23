@@ -47,13 +47,27 @@ public class FirebaseSDK : MonoBehaviour
     [DllImport("__Internal")]
     private static extern void SignInUserAnonymously(string objectName, string callback, string fallback);
     [DllImport("__Internal")]
-    private static extern void LogEventWithParameter(string eventName, string parameter, string objectName, string callback, string fallback);
+    private static extern void LogEventWithParameter(string eventName, string parameterName, string value1, string objectName, string callback, string fallback);
+    [DllImport("__Internal")]
+    private static extern void SetUserProperty(string userPropertySet, string objectName, string callback, string fallback);
     private void Awake()
     {
         Instance = this;
         analysisManager = FindObjectOfType<AnalysisManager>();
+        var e = new AnalyticsEvent(AnalyticsEventID.SpendMoon, 4);
+        LogEvent(e);
     }
 
+
+    public void LogEvent(AnalyticsEvent e)
+    {
+        _id = e._id;
+        _data = e.IntData;
+        Debug.LogError(e._id.IdToString());
+        Debug.LogError(e.IntData.ToString());
+        Debug.LogError(e._id);
+        LogEventWithParameter(e._id.IdToString(), e._id.IdParameter() , e.IntData.ToString(), gameObject.name, "OnRequestSuccess", "OnRequestFailed");
+    }
     /// <summary>
     /// On session start we initialize some stats, and update wanted data (marketing, retention, etc)
     /// </summary>
@@ -70,7 +84,8 @@ public class FirebaseSDK : MonoBehaviour
         ///To sign in anonymously:
         SignInUserAnonymously(gameObject.name, "OnRequestSuccess" , "OnRequestFailed");
         ///Log event :
-        LogEventWithParameter("test_event", "items: [{test_parameter : '0'}]", gameObject.name, "OnRequestSuccess", "OnRequestFailed");
+        //LogEventWithParameter("test_event", "items: [{test_parameter : '0'}]", gameObject.name, "OnRequestSuccess", "OnRequestFailed");
+        //SetUserProperty("{test_property : 'test_parameter;}", gameObject.name, "OnRequestSuccess" , "OnRequestFailed");
         //GetJSON($"{kUsername}/Retention/D1", gameObject.name, "PerformStartActions", "OnRequestFailed"); ///Player retention by days, and daily active users\
         //GetMarketingData();
     }
@@ -324,7 +339,8 @@ public class FirebaseSDK : MonoBehaviour
     {
         _id = e._id;
         _data = e.IntData;
-        ModifyNumberWithTransaction($"{kUsername}/MoonRewarded/D{_elapsedDays + 1}", e.IntData, gameObject.name, "OnRequestSuccess", "OnRequestFailed");
+        //ModifyNumberWithTransaction($"{kUsername}/MoonRewarded/D{_elapsedDays + 1}", e.IntData, gameObject.name, "OnRequestSuccess", "OnRequestFailed");
+        //LogEventWithParameter("moon_rewarded", e.IntData.ToString(), gameObject.name, "OnRequestSuccess" , "OnRequestFailed");
     }
 
     /// <summary>
@@ -336,6 +352,7 @@ public class FirebaseSDK : MonoBehaviour
         _id = e._id;
         _data = e.IntData;
         ModifyNumberWithTransaction($"{kUsername}/MoonSpent/D{_elapsedDays + 1}", e.IntData, gameObject.name, "OnRequestSuccess", "OnRequestFailed");
+        //LogEventWithParameter("moon_spent", e.IntData.ToString(), gameObject.name, "OnRequestSuccess", "OnRequestFailed");
     }
 
     /// <summary>
@@ -512,8 +529,8 @@ public class FirebaseSDK : MonoBehaviour
     /// <param name="data"></param>
     public void OnRequestSuccess(string data)
     {
-        var returnEvent = new AnalyticsEvent(_id, AnalyticsEventReturnType.OperationSuccesful, _data);
-        analysisManager.ProccessReturnResult(returnEvent);
+        //var returnEvent = new AnalyticsEvent(_id, AnalyticsEventReturnType.OperationSuccesful, _data);
+        //analysisManager.ProccessReturnResult(returnEvent);
         text.text = data;
     }
 
@@ -523,8 +540,8 @@ public class FirebaseSDK : MonoBehaviour
     /// <param name="error"></param>
     public void OnRequestFailed(string error)
     {
-        var returnEvent = new AnalyticsEvent(_id, AnalyticsEventReturnType.OperationFailed, _data);
-        analysisManager.ProccessReturnResult(returnEvent);
+        //var returnEvent = new AnalyticsEvent(_id, AnalyticsEventReturnType.OperationFailed, _data);
+        //analysisManager.ProccessReturnResult(returnEvent);
         text.text = error;
 
     }

@@ -22,7 +22,28 @@ public partial class AnalysisManager : MonoBehaviour
     public void RegisterHandlers()
     {
         Debug.Log("HandlersGettingRegisterd");
-        RegisterHandler(AnalyticsEventID.StartSession, HandlerStartSession);
+
+        RegisterHandler(AnalyticsEventID.RewardMoon, HandlerLogEvent);
+        RegisterHandler(AnalyticsEventID.SpendMoon, HandlerLogEvent);
+        RegisterHandler(AnalyticsEventID.NFTOwned, HandlerLogEvent);
+        RegisterHandler(AnalyticsEventID.NFTPlaced, HandlerLogEvent);
+        RegisterHandler(AnalyticsEventID.TotalNFTValue, HandlerLogEvent);
+        RegisterHandler(AnalyticsEventID.LoadWorldMap, HandlerLogEvent);
+        RegisterHandler(AnalyticsEventID.SelectTile, HandlerLogEvent);
+        RegisterHandler(AnalyticsEventID.SelectTileConfirmed, HandlerLogEvent);
+        RegisterHandler(AnalyticsEventID.ConfirmName, HandlerLogEvent);
+        RegisterHandler(AnalyticsEventID.CreateTown, HandlerLogEvent);
+        RegisterHandler(AnalyticsEventID.LoadIntroductionPopup, HandlerLogEvent);
+        RegisterHandler(AnalyticsEventID.CloseIntroductionPopup, HandlerLogEvent);
+        RegisterHandler(AnalyticsEventID.CompleteSale, HandlerLogEvent);
+        RegisterHandler(AnalyticsEventID.ReachFuelProduction, HandlerLogEvent);
+        RegisterHandler(AnalyticsEventID.ClearXObstacles, HandlerLogEvent);
+        RegisterHandler(AnalyticsEventID.EnterFreeDateTour, HandlerLogEvent);
+        RegisterHandler(AnalyticsEventID.EnterPaidDateTour, HandlerLogEvent);
+        RegisterHandler(AnalyticsEventID.RewardsCollected, HandlerLogEvent);
+        RegisterHandler(AnalyticsEventID.RewardsExpired, HandlerLogEvent);
+
+        /*RegisterHandler(AnalyticsEventID.StartSession, HandlerStartSession);
         RegisterHandler(AnalyticsEventID.UpdateSessionProgress, HandlerUpdateSession);
         RegisterHandler(AnalyticsEventID.EndSession, HandlerEndSession);
 
@@ -40,10 +61,10 @@ public partial class AnalysisManager : MonoBehaviour
         RegisterHandler(AnalyticsEventID.EnterP2ETournament, HandlerEnterP2ETournament);
         RegisterHandler(AnalyticsEventID.AccumulateScore, HandlerAccumulateScore);
 
-        RegisterHandler(AnalyticsEventID.RewardMOON, HandlerRewardMOON);
-        RegisterHandler(AnalyticsEventID.SpendMOON, HandlerSpendMOON);
+        RegisterHandler(AnalyticsEventID.RewardMOON, HandlerLogEvent);
+        RegisterHandler(AnalyticsEventID.SpendMOON, HandlerLogEvent);
         RegisterHandler(AnalyticsEventID.GainNFT, HandlerGainNFT);
-        RegisterHandler(AnalyticsEventID.PlaceNFT, HandlerPlaceNFT);
+        RegisterHandler(AnalyticsEventID.PlaceNFT, HandlerPlaceNFT);*/
 
         // return types from firebase
         RegisterReturnTypeHandler(AnalyticsEventReturnType.OperationSuccesful, UpdateSuccessful);
